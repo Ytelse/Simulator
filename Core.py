@@ -20,7 +20,7 @@ class ColumnRunner:
         return lambda: self._prefix_y_value
 
 
-class ColumnCore:
+class ColumnTrain:
     def __init__(self, width, word_size, row_width, ram,
                  x_bus_stream, start_stream, offset_stream):
 
