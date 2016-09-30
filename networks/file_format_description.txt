@@ -1,0 +1,35 @@
+First line is the number n. It specifies how many layers there are in the network. That is the number of matrices and vectors.
+If the first line is 4, it means that there will come 4 matrices and 4 bias vectors in the input.
+
+Then there will come n pairs of matrices and vectors. First a matrix and then a vector
+The matrix starts with two lines. The first line is matrix width and the second is matrix height.
+The next (matrix width) * (matrix height) lines is each element in the matrix, written row wise.
+
+After each matrix, the bias vector is written. The first line of the vector is the size of the vector.
+The next (vector size) lines are each element in the vector.
+
+After the vector is the next matrix.
+
+Example with comments
+2	//There are two matrices and two vectors in input
+3	//The width of the matrix
+2	//The height of the matrix
+1	//The 6 lines are the contents of the matrix
+-1
+1
+-1
+1
+1
+3	//The size of the vector
+1	//The three lines are the elements in the vector
+-1
+1
+2	//The width of the matrix
+2	//The height of the matrix
+1	//The next 4 elements are the elements of the matrix
+-1
+-1
+1
+2	//The size of the vector
+-1	//The 2 lines are the elements of the  vector
+-1
