@@ -5,7 +5,7 @@ class Ram:
 	
 	def __init__(self):
 		self._memory = np.array([])
-		self._accessHistory = [[]]
+		self._access_history = [[]]
 	
 	def add_content(self,values):
 		offset = len(self._memory)
@@ -17,18 +17,21 @@ class Ram:
 		if len(r) < width:
 			r = np.append(self._memory, [0] * width)
 		
-		self._accessHistory[-1].append(("read",addr,width))
+		self._access_history[-1].append(("read",addr,width))
 		
 		return r
 	
 	def put_values(self,addr,values):
 		self._memory[addr:addr + len(values)] = values
-		self._accessHistory[-1].append(("write",addr,len(values)))
+		self._access_history[-1].append(("write",addr,len(values)))
 		
 	def tick(self):
-		self._accessHistory.append([])
+		self._access_history.append([])
 	
 	def get_history(self):
-		return self._accessHistory
+		return self._access_history
+		
+	def clear_history(self):
+		self._access_history = [[]]
 
 	

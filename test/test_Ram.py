@@ -36,15 +36,34 @@ class TestRam(unittest.TestCase):
         vector = self.ram.get_values(14,5)
         self.assertTrue((vector == [15,16,17,18,19]).all())
         
-    def test_put_values(self):
-        pass
+    def test_put_values_1(self):
+        self.ram.put_values(self.matrix_offset,np.array([20,21,22,23]))
+        self.assertTrue((self.ram.get_values(0,10) == np.array([20,21,22,23,5,6,7,8,9,10])).all())
     
+    def test_put_values_2(self):
+        self.ram.put_values(self.write_vector_offset,np.array([20,21,22,23]))
+        self.assertTrue((self.ram.get_values(self.write_vector_offset,4) == np.array([20,21,22,23])).all())
     
-    def test_tick(self):
-        pass
-    
-    def test_history(self):
-        pass
+    def test_history_1(self):
+        self.assertEqual(self.ram.get_history(),[[]])
+        self.ram.get_values(0,9)
+        self.ram.put_values(4,[20,21,22,23,24,25,26])
+        self.ram.tick()
+        self.ram.get_values(9,3)
+        self.ram.put_values(5,[27,28,29,30,31,32,33])
+        self.assertEqual(self.ram.get_history(),[[("read",0,9),("write",4,7)],[("read",9,3),("write",5,7)]])
+
+    def test_clear_history_1(self):
+        self.assertEqual(self.ram.get_history(),[[]])
+        self.ram.get_values(0,9)
+        self.ram.put_values(4,[20,21,22,23,24,25,26])
+        self.ram.tick()
+        self.ram.get_values(9,3)
+        self.ram.put_values(5,[27,28,29,30,31,32,33])
+        self.assertEqual(self.ram.get_history(),[[("read",0,9),("write",4,7)],[("read",9,3),("write",5,7)]])
+        
+        self.ram.clear_history()
+        self.assertEqual(self.ram.get_history(),[[]])
 
 
 if __name__ == '__main__':
