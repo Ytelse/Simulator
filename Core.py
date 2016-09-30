@@ -78,3 +78,10 @@ class ColumnTrain:
 
     def y_stream(self):
         return self._runners[-1].prefix_y_stream()
+
+class ColumnCore:
+	def __init__(self):
+		pass
+	
+	def tick(self):
+		pass
