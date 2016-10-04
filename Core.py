@@ -21,13 +21,13 @@ class ColumnRunner:
 
 
 class ColumnTrain:
-    def __init__(self, width, word_size, row_width, ram,
+    def __init__(self, runners, word_size, matrix_shape, ram,
                  x_bus_stream, start_stream, offset_stream):
 
-        assert len(x_bus_stream()) == width * word_size
+        assert len(x_bus_stream()) == runners * word_size
 
-        self.row_width = row_width
-        self.width = width
+        self.matrix_shape = matrix_shape
+        self.runners = runners
         self.word_size = word_size
 
         self._start_stream = start_stream
@@ -36,12 +36,12 @@ class ColumnTrain:
         self._offset_value = -1
         self._next_offset_value = -1
 
-        self._runners = [None] * width
-        self._w_streams = [None] * width
-        for i in range(width):
+        self._runners = [None] * runners
+        self._w_streams = [None] * runners
+        for i in range(runners):
             x_stream = self._make_x_stream(x_bus_stream, i)
 
-            matrix_index = i*(width + 1)*word_size
+            matrix_index = i*(runners + 1)*word_size
             self._w_streams[i] = self._make_w_stream(ram, i)
 
             prev_prefix_y_stream = \
@@ -57,15 +57,16 @@ class ColumnTrain:
         return lambda: x_bus_stream()[i*self.word_size:(i+1)*self.word_size]
 
     def _make_w_stream(self, ram, i):
+        shard_length = self.matrix_shape[0]*self.matrix_shape[0] // self.runners
         return lambda: ram(
-            self._offset_value - i*(self.row_width - self.word_size),
+            (self._offset_value % shard_length) + i*shard_length,
             self.word_size)
 
     def propagate_combinatorial_logic(self):
         for runner in self._runners:
             runner.propagate_combinatorial_logic()
 
-        self._next_offset_value = self._offset_value + self.row_width
+        self._next_offset_value = self._offset_value + self.word_size
 
     def tick(self):
         for runner in self._runners:

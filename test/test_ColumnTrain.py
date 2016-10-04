@@ -1,6 +1,7 @@
 import unittest
 from Core import ColumnTrain
 import numpy as np
+from MatrixLayout import layout_matrix_column_wise
 
 
 class TestColumnTrain(unittest.TestCase):
@@ -19,10 +20,10 @@ class TestColumnTrain(unittest.TestCase):
             [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 0],
             [1, 1, 1, 1, 0, 1, 0, 0, 1, 0, 0, 0],
         ])
-        matrix = matrix.flatten()
+        laid_out_matrix = layout_matrix_column_wise(matrix, 3, 2)
 
         def ram(addr, width):
-            r = matrix[addr:addr+width]
+            r = laid_out_matrix[addr:addr+width]
             if len(r) < width:
                 r = np.array([0] * width)
             return r
@@ -32,9 +33,9 @@ class TestColumnTrain(unittest.TestCase):
         self.offset = 0
 
         self.train = ColumnTrain(
-            width=3,
+            runners=3,
             word_size=2,
-            row_width=12,
+            matrix_shape=matrix.shape,
             ram=ram,
             x_bus_stream=lambda: self.x_bus,
             start_stream=lambda: self.start,
@@ -53,11 +54,14 @@ class TestColumnTrain(unittest.TestCase):
         return self.y_stream()
 
     def test_full(self):
+
+        x_bus_1 = [1, 0, 1, 0, 1, 1]
+        x_bus_2 = [1, 1, 1, 0, 0, 0]
+
+        x_bus = np.array(x_bus_1)
+
         # Run 1 over the first six columns
-        x_bus = np.array([1, 0, 1, 0, 1, 1])
-
         self.do_cycle(x_bus, start=1, offset=0)
-
         self.do_cycle(x_bus, start=0, offset=-1)
         self.do_cycle(x_bus, start=0, offset=-1)
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 5)
@@ -70,16 +74,14 @@ class TestColumnTrain(unittest.TestCase):
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 4)
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 5)
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 4)
+        x_bus = np.array(x_bus_2[:2] + x_bus_1[2:])
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 2)
+        x_bus = np.array(x_bus_2[:4] + x_bus_1[4:])
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 3)
+        x_bus = np.array(x_bus_2)
 
         # Run 2 over the last six columns
-        x_bus = np.array([1, 1, 1, 0, 0, 0])
 
-        self.do_cycle(x_bus, start=1, offset=6)
-
-        self.do_cycle(x_bus, start=0, offset=-1)
-        self.do_cycle(x_bus, start=0, offset=-1)
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 2)
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 0)
         self.assertEqual(self.do_cycle(x_bus, start=0, offset=-1), 2)
