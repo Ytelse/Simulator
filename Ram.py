@@ -4,7 +4,7 @@ import numpy as np
 class Ram:
 
     def __init__(self):
-        self._memory = np.array([])
+        self._memory = np.array([], dtype=int)
         self._access_history = [[]]
 
     def add_content(self, values):
